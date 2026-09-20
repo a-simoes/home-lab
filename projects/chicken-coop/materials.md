@@ -32,7 +32,7 @@ Being made to order. Collected and priced once the shop is done.
 | Item | Specification | Qty |
 |------|---------------|-----|
 | Door panel | Aluminium sheet, 2.5 mm thick, 45 cm high by 50 cm wide | 1 |
-| Z profile rail | 3 by 10 by 3 mm section, 900 mm length | 2 |
+| Z profile rail | 3 by 10 by 3 mm section, 2 mm thick, 900 mm length | 2 |
 
 Total: to be confirmed on collection.
 

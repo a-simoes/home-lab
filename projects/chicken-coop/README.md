@@ -26,6 +26,7 @@ the internet, or on remembering anything.
 | D4 | Always reaches fully closed, because a door left ajar is a way in |
 | D5 | Can be opened and closed by hand, without power |
 | D6 | Stays locked when closed, so a fox cannot force it open |
+| D7 | Travel stops at both ends of the stroke without software, using the limit switches built into the actuator |
 
 ## Watering
 
