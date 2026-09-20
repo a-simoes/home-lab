@@ -1,6 +1,6 @@
 # Wiring
 
-## Diagram
+## Overview
 
 ```mermaid
 flowchart LR
@@ -23,6 +23,76 @@ flowchart LR
   CH1 -->|COM| MOTOR
   CH2 -->|COM| MOTOR
 ```
+
+## Detailed wiring
+
+The 12 V side, terminal to terminal, starting at the supply output. Everything upstream of
+V+ and V- is in the overview. Shelly markings are the ones printed on its leads.
+
+```mermaid
+flowchart LR
+  subgraph SUP["Power supply"]
+    SVP["V+"]
+    SVN["V-"]
+  end
+
+  P12(["+12 V rail"])
+  GNDR(["GND rail"])
+
+  subgraph SH["Shelly Plus Uni"]
+    VAC1["VAC1"]
+    VAC2["VAC2"]
+    O1A["OUT 1 a"]
+    O1B["OUT 1 b"]
+    O2A["OUT 2 a"]
+    O2B["OUT 2 b"]
+  end
+
+  subgraph RB["Relay board, active high"]
+    DCP["DC+"]
+    DCN["DC-"]
+    IN1["IN1"]
+    IN2["IN2"]
+    C1C["CH1 COM"]
+    C1NO["CH1 NO"]
+    C1NC["CH1 NC"]
+    C2C["CH2 COM"]
+    C2NO["CH2 NO"]
+    C2NC["CH2 NC"]
+  end
+
+  subgraph ACT["Linear actuator"]
+    MA["wire A"]
+    MB["wire B"]
+  end
+
+  SVP --> P12
+  SVN --> GNDR
+
+  P12 --> VAC1
+  GNDR --> VAC2
+  P12 --> DCP
+  GNDR --> DCN
+
+  P12 --> O1A
+  O1B --> IN1
+  P12 --> O2A
+  O2B --> IN2
+
+  P12 --> C1NO
+  GNDR --> C1NC
+  P12 --> C2NO
+  GNDR --> C2NC
+  C1C --> MA
+  C2C --> MB
+```
+
+## Unused terminals
+
+Nothing connects to the Shelly's `+5 VDC`, `GND`, `IN1`, `IN2`, `ANALOG IN`, `COUNT IN`,
+`DATA` or `SENSOR VCC`. Channels 3 and 4 of the relay board are spare.
+
+The two digital inputs staying free is what leaves room for door position sensing later.
 
 ## Motor states
 
