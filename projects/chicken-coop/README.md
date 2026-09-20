@@ -2,6 +2,10 @@
 
 An automatic coop door and watering system that runs itself.
 
+- [Materials](materials.md) with what each part cost and where it came from
+- [Wiring](wiring.md) for the overview and the terminal level detail
+- [Build](build.md) with photos of the assembly
+
 ## Goal
 
 Leave for a few days without arranging for anyone to visit the coop. The door opens and
