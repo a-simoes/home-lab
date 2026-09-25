@@ -47,6 +47,18 @@ a: on the Shelly, because it keeps the schedule offline
 b: (preferred) on the Shelly with a fallback table, because it survives a clock reset
 ```
 
+## Secrets
+
+Nothing sensitive reaches the repo. Before committing an exported config, a log or a
+screenshot, replace the value with `***` and keep the key, so the shape of the file stays
+readable and the secret does not survive.
+
+Redact passwords, tokens, API keys, Wi-Fi names, MQTT hosts and users, device
+identifiers, static addresses and anything else that describes my network. Keep the file
+valid, so a JSON value becomes `"***"`.
+
+When unsure whether a value is sensitive, redact it and tell me.
+
 ## Git
 
 Commits and pushes are authorized in this repository. Batch the work and commit when I
