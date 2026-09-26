@@ -23,6 +23,7 @@
 
 let CHECK_INTERVAL_MS = 60 * 1000;
 let SETTLE_CHECKS = 3; // Consecutive checks that must disagree before the access point changes.
+let LOG_PREFIX = "[wifi-ap-fallback] ";
 
 let state = {
   connected: false,
@@ -58,17 +59,23 @@ function checkAccessPoint() {
 // a change in the other direction also waits SETTLE_CHECKS checks. A failed
 // write keeps its count, so the next check retries at once.
 function setAccessPoint(enable) {
-  print(enable ? "Wi-Fi lost. Turning the access point on." : "Wi-Fi back. Turning the access point off.");
+  log(enable ? "Wi-Fi lost. Turning the access point on." : "Wi-Fi back. Turning the access point off.");
   Shelly.call("WiFi.SetConfig", { config: { ap: { enable: enable } } }, function (result, errorCode) {
     if (errorCode) return;
     state.disagreements = 0;
-    if (result && result.restart_required) print("The access point change needs a restart to apply.");
+    if (result && result.restart_required) log("The access point change needs a restart to apply.");
   });
+}
+
+// Writes one log line, prefixed with the script name so both scripts can be told
+// apart in the device log.
+function log(message) {
+  print(LOG_PREFIX + message);
 }
 
 // Entry point. Starts the periodic check.
 function main() {
-  print("Wi-Fi fallback started. Checking every " + (CHECK_INTERVAL_MS / 1000) + " seconds.");
+  log("Started. Checking Wi-Fi every " + (CHECK_INTERVAL_MS / 1000) + " seconds.");
   Timer.set(CHECK_INTERVAL_MS, true, checkWifi);
 }
 

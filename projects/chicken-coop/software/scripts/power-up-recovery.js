@@ -27,6 +27,7 @@
 
 let CHECK_INTERVAL_MS = 5 * 60 * 1000;
 let CLOCK_VALID_AFTER = 1577836800; // 2020-01-01 UTC. Earlier means the clock was never set.
+let LOG_PREFIX = "[power-up-recovery] ";
 
 let state = {
   timer: null,
@@ -58,7 +59,6 @@ function checkClock() {
 
 // Clock is valid. Enables both solar jobs, then runs the one due most recently.
 function recover() {
-  print("Clock valid. Recovering.");
   Shelly.call("Schedule.List", {}, function (list, errorCode) {
     if (errorCode || !readSolarJobs(list)) return;
     setSchedules(true, runLatestJob);
@@ -75,14 +75,14 @@ function runLatestJob() {
     let sunriseDue = results[0].prev || 0;
     let sunsetDue = results[1].prev || 0;
     let latest = sunriseDue > sunsetDue ? state.sunrise : state.sunset;
-    print("Running " + latest.timespec);
+    log("Clock valid. Running " + latest.timespec + ", the solar job due last.");
     callAll(latest.calls, stopScript);
   });
 }
 
 // Ends the recovery. Nothing runs again until the next boot.
 function stopScript() {
-  print("Recovery complete. Stopping.");
+  log("Finished. Stopping until the next boot.");
   Timer.clear(state.timer);
   Shelly.call("Script.Stop", { id: Shelly.getCurrentScriptId() });
 }
@@ -91,7 +91,6 @@ function stopScript() {
 
 // No clock. Disables both solar jobs so they cannot fire on a wrong clock, then opens the door.
 function survive() {
-  print("No clock. Starting survival.");
   Shelly.call("Schedule.List", {}, function (list, errorCode) {
     if (errorCode || !readSolarJobs(list)) return;
     setSchedules(false, openDoor);
@@ -100,9 +99,9 @@ function survive() {
 
 // Runs the sunrise job, the open action, and records that survival ran.
 function openDoor() {
+  log("No clock. Opening the door with " + state.sunrise.timespec + ".");
   callAll(state.sunrise.calls, function () {
     state.survived = true;
-    print("Door opened. Waiting for the clock.");
   });
 }
 
@@ -128,6 +127,7 @@ function setSchedules(enable, then) {
   let updates = [];
   for (let i = 0; i < jobs.length; i++) {
     if (jobs[i].enable !== enable) {
+      log((enable ? "Enabling " : "Disabling ") + "schedule " + jobs[i].timespec);
       updates.push({
         method: "Schedule.Update",
         params: { id: jobs[i].id, enable: enable, timespec: jobs[i].timespec, calls: jobs[i].calls }
@@ -160,11 +160,17 @@ function callAll(calls, then) {
   }
 }
 
+// Writes one log line, prefixed with the script name so both scripts can be told
+// apart in the device log.
+function log(message) {
+  print(LOG_PREFIX + message);
+}
+
 // ---------------------------------------------------------------- main
 
 // Entry point. Starts the periodic clock check.
 function main() {
-  print("Power up recovery started. Checking the clock every " + (CHECK_INTERVAL_MS / 60000) + " minutes.");
+  log("Started. Checking the clock every " + (CHECK_INTERVAL_MS / 60000) + " minutes.");
   state.timer = Timer.set(CHECK_INTERVAL_MS, true, checkClock);
 }
 
